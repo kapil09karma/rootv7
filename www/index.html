@@ -1,0 +1,1287 @@
+<html ng-app="ionicApp">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+	<title>Side Menus</title>
+    <script src="js/jquery-2.1.1.min.js"></script>
+    <link href="lib/ionic/css/ionic.min.css" rel="stylesheet">
+	<script src="lib/ionic/js/ionic.bundle.min.js"></script>
+    
+    <style>
+	.backcolor{background-color:#F8F8F8}
+	a{text-decoration: none; display:block;  width: 100%; color:#000;}
+	.custom-icon{font-size:30px ;cursor:pointer;}
+	.custom-icon1{font-size:40px; background-color:#336;color:red;}
+	.custom-icon2{font-size:40px;}
+	.custom-icon4{ color:#11C1F3; font-weight:bold;}
+	
+	.highimg{background-image:url(images/fast_fan.svg); background-repeat:no-repeat;}
+	.medimg{background-image:url(images/medium_fan.svg); background-repeat:no-repeat; background-position:center; background-position:top}
+	.lowimg{ background-image:url(images/slow_fan.svg);  background-repeat:no-repeat;}
+	.offimg{background-image:url(images/off_fan.svg); background-repeat:no-repeat;}
+	
+	.highimg_blue{background-image:url(images/fast_fan_blue.svg); background-repeat:no-repeat; background-position:center; background-position:top}
+	.medimg_blue{background-image:url(images/medium_fan_blue.svg); background-repeat:no-repeat; background-position:center; background-position:top}
+	.lowimg_blue{ background-image:url(images/slow_fan_blue.svg);  background-repeat:no-repeat; background-position:center; background-position:top}
+	.offimg_blue{background-image:url(images/off_fan_blue.svg); background-repeat:no-repeat; background-position:center; background-position:top}
+	</style>
+  </head>
+
+  <body ng-controller="MainCtrl">
+	<ion-nav-bar class="bar-dark">
+      <ion-nav-back-button class="button-icon ion-arrow-left-c">
+      </ion-nav-back-button>
+    </ion-nav-bar>
+             
+    <ion-nav-view></ion-nav-view>
+
+    <script id="sign-in.html" type="text/ng-template">
+      <ion-view view-title="Sign-In">
+        <ion-content>
+          <div class="list"  style="margin-top:80px;">
+            <label class="item item-input">
+              <span class="input-label">Username</span>
+              <input type="text" ng-model="user.username">
+            </label>
+            <label class="item item-input">
+              <span class="input-label">Password</span>
+              <input type="password" ng-model="user.password">
+            </label>
+          </div>
+          <div class="padding">
+            <button class="button button-block button-dark" ng-click="signIn(user)">
+              Sign-In
+            </button>
+            <p class="text-center">
+              <a href="#/forgot-password" style="text-decoration:none; color:#000">Forgot password?</a>
+            </p>
+          </div>
+        </ion-content>
+      </ion-view>
+    </script>
+
+    <script id="forgot-password.html" type="text/ng-template">
+      <ion-view view-title="Forgot Password">
+        <ion-content padding="false">
+          <p>
+			<div class="list" style="margin-top:80px;">
+			<label class="item item-input">
+			  <span class="input-label">Email</span>
+			  <input type="text" ng-model="user.username">
+			</label>
+			
+			</div>
+			<div class="padding">
+			<button class="button button-block button-dark" ng-click="signIn(user)">
+			  Send me reset instructions
+			</button>
+			</div>
+		  </p>
+		  <p>
+			Return to <a href="#/sign-in">Sign-In</a>.
+		  </p>
+        </ion-content>
+      </ion-view>
+    </script>
+
+    <script id="templates/event-menu.html" type="text/ng-template">
+      <ion-side-menus enable-menu-with-back-views="false">
+
+        <ion-side-menu-content>
+          <ion-nav-bar class="bar-dark">
+            <ion-nav-back-button>
+            </ion-nav-back-button>
+
+            <ion-nav-buttons side="left">
+              <button class="button button-icon button-clear ion-navicon" menu-toggle="left">
+              </button>
+            </ion-nav-buttons>
+          </ion-nav-bar>
+
+          <ion-nav-view name="menuContent"></ion-nav-view>
+        </ion-side-menu-content> 
+
+        <ion-side-menu side="left">
+          <ion-header-bar class="bar-calm">
+            <h1 class="title">Menus</h1>
+          </ion-header-bar>
+          <ion-content>
+            <ul class="list">
+              <!-- Note each link has the 'menu-close' attribute so the menu auto closes when clicking on one of these links -->
+              <a href="#/event/check-in" class="item item-icon-left" menu-close><i class="icon ion-ios-speedometer-outline"></i>Dashboard</a>
+			  <a href="#/event/messages" class="item  item-icon-left" menu-close><i class="icon ion-ios-email-outline"></i>Messages</a>
+              <a href="#/event/attendees" class="item  item-icon-left" menu-close><i class="icon ion-social-rss-outline"></i>Root Control</a>
+			  <a href="#/sign-in" class="item item-icon-left" menu-close><i class="icon ion-log-out"></i>Logout</a>
+            </ul>
+          </ion-content>
+        </ion-side-menu>
+
+      </ion-side-menus>
+    </script>
+
+    <script id="templates/home.html" type="text/ng-template">
+      <ion-view view-title="[ root ]">
+        <ion-content class="padding">
+          <p>Swipe to the right to reveal the left menu.</p>
+          <p>(On desktop click and drag from left to right)</p>
+        </ion-content>
+      </ion-view>
+    </script>
+
+    <script id="templates/check-in.html" type="text/ng-template">
+     <ion-view view-title="Dashboard">
+        <ion-content>
+		<ion-header-bar class="bar-stable">
+			<button ng-click="hideItems()" class="button button-icon ion-ios-arrow-back">Thermostat</button>
+			<button ng-click="validate()" class="button button-icon icon-right ion-ios-arrow-forward">Schedule</button>
+		</ion-header-bar>
+		
+		<div class="list" style="padding-top:40px;">
+			<div class = "row padding" style="text-align:center;">
+				<div class="col col-25"  style="margin-top:38px;">
+					<a class="{{securityclass}}" ng-click="changesecurity()"></a>
+					<br><span  ng-bind-html="securitytext">Arm</span>
+				</div>
+				<div class="col col-50" style="font-size:54px; text-align:center; border-radius:100%; color:#000;">
+				<br><br><span style="font-size:87px;">{{response[0].hvac_temprature}}&deg;</span><br><br>
+				</div>
+				<div class="col col-25" style="margin-top:px;">
+				 	<i class="button-clear button ion-ios-plus-empty custom-icon1" ng-click="uptemp()" ></i>
+						<a style="font-size:38px; padding:15px 0px 25px 5px;"  ng-bind-html="setpointtemp">70</a>
+					<i class="button-clear button ion-ios-minus-empty custom-icon1" ng-click="downtemp()" ></i>
+				</div>
+			</div>
+		</div>
+		<div class="list" style="margin-top:-40px;">
+			<div class="item item-divider" style="font-weight:bold; background-color:#1D4461; color:#FFF">
+				System Control
+			</div>
+			<div class = "row padding" style="text-align:center; margin-top:-14px;">
+				<div class="col col-25"><button class="button button-icon ion-ios-flame-outline custom-icon {{systemcontrolH}}" ng-click="changesystemcontrol('H')"><p style="font-size:14px;">Heat</p></button></div>
+				<div class="col col-25"><button class="button button-icon ion-ios-snowy custom-icon {{systemcontrolC}}" ng-click="changesystemcontrol('C')"><p style="font-size:14px;">Cool</p></button></div>
+				<div class="col col-25"><button class="button button-icon ion-ios-loop custom-icon {{systemcontrolA}}" ng-click="changesystemcontrol('A')"><p style="font-size:14px;">Auto</p></button></div>
+				<div class="col col-25"><button class="button button-icon ion-power custom-icon {{systemcontrolO}}" ng-click="changesystemcontrol('O')"><p style="font-size:14px;">Off</p></button></div>
+			</div>
+			<div class="item item-divider" style="font-weight:bold; background-color:#496880; color:#FFF; margin-top:-34px;">
+				Fan Control
+			</div>
+			<div class = "row padding" style="text-align:center;  margin-top:-14px;">
+				<div class="col col-25"><button class="button button-icon custom-icon {{fancontrolHimg}} {{fancontrolH}}" ng-click="changefancontrol('H')"><p style="font-size:14px; padding-top:35px;">High</p></button></div>
+				<div class="col col-25"><button class="button button-icon {{fancontrolMimg}} custom-icon {{fancontrolM}}" ng-click="changefancontrol('M')"><p style="font-size:14px; padding-top:35px;">Medium</p></button></div>
+				<div class="col col-25"><button class="button button-icon {{fancontrolLimg}} custom-icon {{fancontrolL}}" ng-click="changefancontrol('L')"><p style="font-size:14px; padding-top:35px;">Low</p></button></div>
+				<div class="col col-25"><button class="button button-icon {{fancontrolOimg}} custom-icon {{fancontrolO}}" ng-click="changefancontrol('O')"><p style="font-size:14px; padding-top:35px; padding-left:4px;">Off </p></button></div>
+			</div>
+		</div>
+		</ion-content>
+      </ion-view>
+    </script>
+    
+    <script id="templates/messages.html" type="text/ng-template">
+		<ion-view view-title="Messages" padding-vertical="10px">
+			<br><br>
+			<ul class="list">
+				<li class="item">
+      				<a href="#/event/compose" class="item-icon-left item-icon-right"><i class="button icon ion-ios-compose-outline button-clear button-positive" style="padding-top:8px;"></i> Compose
+						 <i class="icon ion-ios-arrow-right"></i>
+					</a>
+    			</li>
+   			 	<li class="item">
+      				<a href="#/event/receive" class="item-icon-left item-icon-right"><i class="button icon ion-ios-email-outline button-clear button-positive" style="padding-top:8px;"></i> Inbox
+						 <i class="icon ion-ios-arrow-right"></i>
+					</a>
+    			</li>
+				<li class="item">
+					<a href="#/event/sent" class="item-icon-left item-icon-right"><i class="button icon ion-ios-filing-outline button-clear button-positive" style="padding-top:8px;"></i> Sent
+						 <i class="icon ion-ios-arrow-right"></i>
+					</a>
+      			</li>
+			</ul>
+		</ion-view>
+    </script>
+
+	
+	<script id="templates/compose.html" type="text/ng-template">
+            <ion-view view-title="Compose">
+              <ion-content>
+                <fancy-select
+                              header-text="Select Thermostat"
+                              allow-empty='false'
+                              value="val.multiple"
+                              text="countries_text_multiple"
+                              items="countries"
+                              multi-select="true"            
+                              >
+                </fancy-select>
+				 <div class="row">
+				  <div class="col"> 
+					<label class="item item-input text">
+					  <textarea rows="1" name="description" style="height:250px;" ng-model="user.msgvalue"></textarea>
+					</label>
+					
+				  </div>
+				</div>
+				<div class="row">
+				<button class="button button-block button-light" ng-click="sendmessage(user)">
+				  Send  <i class="icon ion-ios-paperplane-outline"></i>
+				</button>
+				</div>
+              </ion-content>
+            </ion-view>
+    </script>
+    
+    <script id="fancy-select.html" type="text/ng-template">
+		<ion-list>
+		  <ion-item class="item-text-wrap" ng-click="showItems($event)">
+			{{text}}
+			<span class="item-note">
+			  {{noteText}}
+			  <img class="{{noteImgClass}}" ng-if="noteImg != ''" src="{{noteImg}}" />
+			</span>
+		  </ion-item>
+		</ion-list>
+	  </script>
+
+          <script id="fancy-select-items.html" type="text/ng-template">
+            <ion-view class="fancy-select-items modal">
+              <ion-header-bar class="bar-positive">
+
+                <button ng-click="hideItems()" class="button button-positive button-icon ion-ios-arrow-back"></button>
+
+                <h1 class="title">{{headerText}}</h1>
+
+                <button ng-click="validate()" class="button button-positive button-icon ion-checkmark"></button>
+
+              </ion-header-bar>
+              <ion-content>
+                <div class="list">
+                  <!-- Multi select -->
+                  <ion-checkbox
+                              ng-repeat="item in items"
+                              ng-if="multiSelect"
+                              ng-checked="item.checked"
+                              ng-model="item.checked"
+                              class="item item-text-wrap">
+                    {{item.text}}
+                  </ion-checkbox>
+				</div>
+              </ion-content>
+            </ion-view>
+          </script>
+    
+	<script id="templates/receive.html" type="text/ng-template">
+          <ion-view title="Inbox">
+			<ion-header-bar class="bar-subheader item-input-inset">
+			<label class="item-input-wrapper">
+			  <i class="icon ion-ios7-search placeholder-icon"></i>
+			  <input type="search" placeholder="Search" ng-model="msgfilter" ng-change="scrollTop()">
+				</label>
+			  </ion-header-bar>
+
+			<ion-nav-buttons side="right">
+			  <a class="button" ng-click="scrollBottom()">
+				Go To Bottom
+			  </a>
+			</ion-nav-buttons>
+
+			 <ion-content>
+				<ion-list>
+					<ion-item ng-repeat="item in items | filter:msgfilter  track by $index" >
+			  			{{item}}
+					</ion-item>
+	     	 	</ion-list>
+					<ion-infinite-scroll  on-infinite="loadMore1()" distance="90%"></ion-infinite-scroll>
+			</ion-content>
+		  </ion-view>
+    </script>
+    
+    <script id="templates/sent.html" type="text/ng-template">
+      <ion-view title="Sent">
+			<ion-header-bar class="bar-subheader item-input-inset">
+			<label class="item-input-wrapper">
+			  <i class="icon ion-ios7-search placeholder-icon"></i>
+			  <input type="search" placeholder="Search" ng-model="searchFilter"  ng-change="scrollTop()">
+				</label>
+			  </ion-header-bar>
+
+			<ion-nav-buttons side="right">
+			  <a class="button" ng-click="scrollBottom()">
+				Go To Bottom
+			  </a>
+			</ion-nav-buttons>
+
+			 <ion-content>
+			 	<ion-list>
+					<ion-item ng-repeat="item in items | filter:searchFilter  track by $index" >
+			  			{{item}}
+					</ion-item>
+	     	 	</ion-list>
+					<ion-infinite-scroll  on-infinite="loadMore()" distance="30%"></ion-infinite-scroll>
+      		</ion-content>
+	  </ion-view>
+    </script>
+    
+	<script id="templates/attendees.html" type="text/ng-template">
+      <ion-view view-title="Root Control">
+        <ion-content>
+		<ion-refresher on-refresh="doRefresh()">
+        </ion-refresher>
+          <div class="list">
+            <div class="item" ng-repeat="group in response"  ng-if="response != 'City'">
+			  <ion-item class="item-stable item" ng-click="toggleGroup(group)" ng-class="{active: isGroupShown(group)}">
+					<i class="icon" ng-class="isGroupShown(group) ? 'ion-minus' : 'ion-plus'"></i>
+					{{group.room_name}}
+			  </ion-item>
+			  <ion-item  class="item-accordion item item-divider" ng-repeat="item in group.sensor_details" ng-show="isGroupShown(group)">
+			  	<a class="item button button-block icon icon-right ion-chevron-right" 
+				ui-sref="eventmenu.detail({sensor_id: item.sensor_id,sensor_type:item.sensor_type,sensor_name:item.sensor_name,schedule_name:item.schedule_name,sensor_type_id:item.sensor_type_id,sensor_status:item.sensor_status})">
+				{{item.sensor_id}}&nbsp;&nbsp;{{item.sensor_name}}</a>
+			</ion-item>
+			</div>
+			<div class="item"  ng-if="response == 'City'">
+				<center>No Device Configured</center>
+			</div>
+          </div>
+        </ion-content>
+      </ion-view>
+    </script>
+    
+    <script id="templates/detail.html" type="text/ng-template">
+	<ion-view title="">
+	<br/>
+		<ion-content class="padding">
+		
+		<div class="list">
+			<label class="item item-input">
+				<div class=" input-label" style=" width: 50%;">
+  					<div class="col col-50">
+						<b>Sensor ID</b>
+					</div>
+				</div>
+				{{response}}
+			</label>
+			<label class="item  item-input">
+				<div class=" input-label" style=" width: 50%;">
+  					<div class="col col-50">
+						<b>Device</b>
+					</div>
+				</div>
+				{{response2}}
+			</label>
+			<label class="item  item-input">
+				<div class=" input-label" style=" width: 50%;">
+  					<div class="col col-50">
+						<b>Type</b>
+					</div>
+				</div>
+				{{response1}}
+			</label>
+			<label class="item item-input">
+				<div class=" input-label" style=" width: 50%;">
+  					<div class="col col-50">
+						<b>Schedule</b>
+					</div>
+				</div>
+				{{response3}}
+			</label>
+			<label class="item item-input">
+				<div class=" input-label" style=" width: 50%;">
+  					<div class="col col-50">
+						<b>Status</b>
+					</div>
+				</div>
+			
+				<label class="toggle" ng-if="response4 == '1'">
+				   <img class="title" ng-if="response5 == 'On'" src="images/sensoricon/rockeron.png">
+				   <img class="title" ng-if="response5 != 'On'" src="images/sensoricon/rockeroff.png">
+				</label>
+				
+				<label class="toggle"  ng-if="response4 == '2'">
+					<input type="checkbox" checked  ng-if="response5 == 'On'">
+					<div class="track" ng-if="response5 == 'On'">
+						<div class="handle"></div>
+					</div>
+					<input type="checkbox" checked  ng-if="response5 != 'On'">
+					<div class="track" ng-if="response5 != 'On'">
+						<div class="handle"></div>
+					</div>
+				</label>
+				
+				<label class="toggle" ng-if="response4 == '3'">
+				   <img class="title" ng-if="response5 == 'Open'" src="images/sensoricon/wopen.png">
+				   <img class="title" ng-if="response5 != 'Open'" src="images/sensoricon/wclosed.png">
+				</label>
+				
+				<label class="toggle"  ng-if="response4 == '4'">
+				   {{response5}}
+				</label>
+				
+				<label class="toggle"  ng-if="response4 == '5'">
+				   <img class="title" ng-if="response5 == 'UnOccupied'" src="images/sensoricon/unoccupied.png">
+				   <img class="title" ng-if="response5 != 'UnOccupied'" src="images/sensoricon/occupied.png">
+				</label>
+			</label>
+		</div>
+	  </ion-content>
+	</ion-view>
+	</script> 
+    
+    <div class="bar bar-footer bar-dark" style="height:15px;">
+  		<!--<div class="title">My Program</div>-->
+	</div>
+<script>
+var globalip = "50.116.21.72:1837";
+angular.module('ionicApp', ['ionic'])
+
+.config(function($stateProvider, $urlRouterProvider) {
+
+  $stateProvider
+   .state('signin', {
+      url: "/sign-in",
+      templateUrl: "sign-in.html",
+      controller: 'SignInCtrl'
+    })
+    .state('forgotpassword', {
+      url: "/forgot-password",
+      templateUrl: "forgot-password.html"
+    })
+    .state('eventmenu', {
+      url: "/event",
+      abstract: true,
+      templateUrl: "templates/event-menu.html"
+    })
+    .state('eventmenu.home', {
+      url: "/home",
+      views: {
+        'menuContent' :{
+          templateUrl: "templates/home.html"
+        }
+      }
+    })
+    .state('eventmenu.checkin', {
+      url: "/check-in",
+      views: {
+        'menuContent' :{
+          templateUrl: "templates/check-in.html",
+          controller: "CheckinCtrl"
+        }
+      }
+    })
+	 .state('eventmenu.messages', {
+      url: "/messages",
+      views: {
+        'menuContent' :{
+          templateUrl: "templates/messages.html",
+        }
+      }
+    })
+	 .state('eventmenu.compose', {
+      url: "/compose",
+      views: {
+        'menuContent' :{
+          templateUrl: "templates/compose.html",
+		  controller: "compose"
+        }
+      }
+    })
+	 .state('eventmenu.receive', {
+      url: "/receive",
+      views: {
+        'menuContent' :{
+          templateUrl: "templates/receive.html",
+		  controller: "receiveCtrl"
+        }
+      }
+    })
+	 .state('eventmenu.sent', {
+      url: "/sent",
+      views: {
+        'menuContent' :{
+          templateUrl: "templates/sent.html",
+		  controller: "sentCtrl"
+        }
+      }
+    })
+    .state('eventmenu.attendees', {
+      url: "/attendees",
+      views: {
+        'menuContent' :{
+          templateUrl: "templates/attendees.html",
+          controller: "MyCtrl1"
+        }
+      }
+    })
+	.state('eventmenu.detail', {
+    url: "/detail/:sensor_id?sensor_type?sensor_name?schedule_name?sensor_type_id?sensor_status",
+    views: {
+      'menuContent': {
+        controller:'DetailCtrl',
+        templateUrl: "templates/detail.html"
+      }
+    }
+  })
+  
+  $urlRouterProvider.otherwise("/sign-in");
+})
+
+.directive('fancySelect', 
+    [
+        '$ionicModal',
+        function($ionicModal) {
+            return {
+                /* Only use as <fancy-select> tag */
+                restrict : 'E',
+
+                /* Our template */
+                templateUrl: 'fancy-select.html',
+
+                /* Attributes to set */
+                scope: {
+                    'items'        : '=', /* Items list is mandatory */
+                    'text'         : '=', /* Displayed text is mandatory */
+                    'value'        : '=', /* Selected value binding is mandatory */
+                    'callback'     : '&'
+                },
+
+                link: function (scope, element, attrs) {
+
+                    /* Default values */
+                    scope.multiSelect   = attrs.multiSelect === 'true' ? true : false;
+                    scope.allowEmpty    = attrs.allowEmpty === 'false' ? false : true;
+
+                    /* Header used in ion-header-bar */
+                    scope.headerText    = attrs.headerText || '';
+
+                    /* Text displayed on label */
+                    // scope.text          = attrs.text || '';
+                    scope.defaultText   = scope.text || '';
+
+                    /* Notes in the right side of the label */
+                    scope.noteText      = attrs.noteText || '';
+                    scope.noteImg       = attrs.noteImg || '';
+                    scope.noteImgClass  = attrs.noteImgClass || '';
+                    
+                    /* Optionnal callback function */
+                    // scope.callback = attrs.callback || null;
+
+                    /* Instanciate ionic modal view and set params */
+
+                    /* Some additionnal notes here : 
+                     * 
+                     * In previous version of the directive,
+                     * we were using attrs.parentSelector
+                     * to open the modal box within a selector. 
+                     * 
+                     * This is handy in particular when opening
+                     * the "fancy select" from the right pane of
+                     * a side view. 
+                     * 
+                     * But the problem is that I had to edit ionic.bundle.js
+                     * and the modal component each time ionic team
+                     * make an update of the FW.
+                     * 
+                     * Also, seems that animations do not work 
+                     * anymore.
+                     * 
+                     */
+                    $ionicModal.fromTemplateUrl(
+                        'fancy-select-items.html',
+                          {'scope': scope}
+                    ).then(function(modal) {
+                        scope.modal = modal;
+                    });
+
+                    /* Validate selection from header bar */
+                    scope.validate = function (event) {
+                        // Construct selected values and selected text
+                        if (scope.multiSelect == true) {
+
+                            // Clear values
+                            scope.value = '';
+                            scope.text = '';
+
+                            // Loop on items
+                            jQuery.each(scope.items, function (index, item) {
+                                if (item.checked) {
+                                    scope.value = scope.value + item.id+';';
+                                    scope.text = scope.text + item.text+', ';
+                                }
+                            });
+
+                            // Remove trailing comma
+                            scope.value = scope.value.substr(0,scope.value.length - 1);
+                            scope.text = scope.text.substr(0,scope.text.length - 2);
+                        }
+
+                        // Select first value if not nullable
+                        if (typeof scope.value == 'undefined' || scope.value == '' || scope.value == null ) {
+                            if (scope.allowEmpty == false) {
+                                scope.value = scope.items[0].id;
+                                scope.text = scope.items[0].text;
+
+                                // Check for multi select
+                                scope.items[0].checked = true;
+                            } else {
+                                scope.text = scope.defaultText;
+                            }
+                        }
+
+                        // Hide modal
+                        scope.hideItems();
+                        
+                        // Execute callback function
+                        if (typeof scope.callback == 'function') {
+                            scope.callback (scope.value);
+                        }
+                    }
+
+                    /* Show list */
+                    scope.showItems = function (event) {
+                        event.preventDefault();
+                        scope.modal.show();
+                    }
+
+                    /* Hide list */
+                    scope.hideItems = function () {
+                        scope.modal.hide();
+                    }
+
+                    /* Destroy modal */
+                    scope.$on('$destroy', function() {
+                      scope.modal.remove();
+                    });
+
+                    /* Validate single with data */
+                    scope.validateSingle = function (item) {
+
+                        // Set selected text
+                        scope.text = item.text;
+
+                        // Set selected value
+                        scope.value = item.id;
+
+                        // Hide items
+                        scope.hideItems();
+                        
+                        // Execute callback function
+                        if (typeof scope.callback == 'function') {
+                            scope.callback (scope.value);
+                        }
+                    }
+                }
+            };
+        }
+    ]
+)
+
+.controller('MainCtrl', function($scope, $ionicSideMenuDelegate) {
+  $scope.attendees = [
+    { firstname: 'Nicolas', lastname: 'Cage' },
+    { firstname: 'Jean-Claude', lastname: 'Van Damme' },
+    { firstname: 'Keanu', lastname: 'Reeves' },
+    { firstname: 'Steven', lastname: 'Seagal' }
+  ];
+  
+  $scope.toggleLeft = function() {
+    $ionicSideMenuDelegate.toggleLeft();
+  };
+})
+
+
+.controller('SignInCtrl', function($scope,$state,$http,$ionicPopup) {
+	$scope.user = {
+		username: '',
+		password : ''
+  	};
+	$scope.signIn = function(user) {
+		var username = user.username;
+		var password = user.password;
+		
+		if(typeof username === "undefined" || typeof password === "undefined" || username == "" || password == ""){
+			$ionicPopup.show({
+			  template: '',
+			  title: 'Please fill all fields',
+			  scope: $scope,
+			  buttons: [
+				{ 
+				  text: 'Ok',
+				  type: 'button-assertive'
+				},
+			  ]
+			})
+		}
+		else{
+			var data_parameters = "username="+username+ "&password="+password;
+			$http.post("http://"+globalip+"/userauth",data_parameters, {
+				headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'}
+			})
+			.success(function(response) {
+				if(response[0].status == "Y"){
+					$state.go('eventmenu.checkin');
+				}
+				else{
+					$ionicPopup.show({
+              		  template: '',
+					  title: 'Username or password is wrong',
+					  scope: $scope,
+					  buttons: [
+						{ 
+						  text: 'Ok',
+						  type: 'button-assertive'
+						},
+					  ]
+              		})
+				}
+			});
+		}
+	};
+})
+
+.controller('compose', function($scope,$http,$ionicPopup) {
+	
+	var slocid = "1";
+	var orgid = "1";
+	var flag = "V";
+	$scope.user = {msgvalue: ""};
+	var userid = 1;
+	$scope.countries = [];
+	var data_parameters = "slocid="+slocid+ "&orgid="+orgid+ "&flag="+flag+ "&userid="+userid;
+	$http.post("http://"+globalip+"/user_map_therm",data_parameters, {
+		headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'}
+	})
+	.success(function(response){
+		for (var i=0; i< response.length; i++) {
+				  $scope.countries.push({id : response[i].therm_id,text: response[i].thermostat_name, checked: false, icon: null});
+		}
+	});
+	
+	$scope.countries_text_single = 'Choose country';
+	$scope.countries_text_multiple = 'Select Thermostat';
+	$scope.val =  {single: null, multiple: null};
+	
+	$scope.sendmessage = function(user){
+		var userarr = "";
+		for(var i = 0; i < $scope.countries.length; i++){
+			if ($scope.countries[i].checked) {
+				userarr += $scope.countries[i].id+",";
+			}
+		}
+		userarr = userarr.substr(0,userarr.length-1);
+
+		if(userarr.length == 0){
+			$ionicPopup.show({
+			  template: '',
+			  title: 'Please select thermostat',
+			  scope: $scope,
+			  buttons: [
+				{ 
+				  text: 'Ok',
+				  type: 'button-assertive'
+				},
+			  ]
+			})
+		}
+		else if(user.msgvalue == ""){
+			$ionicPopup.show({
+			  template: '',
+			  title: 'Please fill message',
+			  scope: $scope,
+			  buttons: [
+				{ 
+				  text: 'Ok',
+				  type: 'button-assertive'
+				},
+			  ]
+			})
+		}
+		else{
+			var data_parameters = "slocid="+slocid+ "&orgid="+orgid+ "&thermid="+userarr+ "&id="+userid+ "&message="+user.msgvalue;
+			$http.post("http://"+globalip+"/send_message_user",data_parameters, {
+				headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'}
+			})
+			.success(function(response){
+				for(var i = 0; i < $scope.countries.length; i++){
+					if ($scope.countries[i].checked) {
+						$scope.countries[i].checked = false;
+					}
+				}
+				
+				$scope.user = {msgvalue: ""};
+				$ionicPopup.show({
+					template: '',
+					title: 'Message sent',
+					scope: $scope,
+					buttons: [
+					{ 
+					  text: 'Ok',
+					  type: 'button-assertive'
+					},
+					]
+				})
+			});
+		}
+	};
+})
+
+.controller('receiveCtrl', function($scope,$http,$ionicModal, $ionicScrollDelegate) {
+	var pagenum = 0;
+	var status = "Y";
+	var globalpagecount = 0;
+	$scope.loadMore1 = function() {
+		var a = []
+		
+		var slocid = "1";
+		var orgid = "1";
+		var thermid = "3"
+		var searchtext = "NA";
+		
+		var pagecount = 5;
+		if(pagenum <= globalpagecount ){
+			pagenum += 1;
+			var userid = 1;
+			var thermid = "3";
+			var data_parameters = "slocid="+slocid+ "&orgid="+orgid+ "&userid="+userid+ "&pagenum="+pagenum+ "&pagecount="+pagecount+ "&searchtext="+searchtext+ "&thermid="+thermid;
+			$http.post("http://"+globalip+"/get_inbox",data_parameters, {
+				headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'}
+			})
+			.success(function(response){
+				if(response[0].status != "N"){
+					globalpagecount = response[0].cnt;
+					$scope.response = response;
+					for (var i=0; i< $scope.response.length; i++) {
+						 $scope.items.push(response[i].msg_remarks);
+					}
+			
+				}
+				
+			});
+	}
+	$scope.$broadcast('scroll.infiniteScrollComplete');
+	
+	};
+	
+	$scope.items = [];
+	
+	$scope.scrollBottom = function() {
+   	 	$ionicScrollDelegate.scrollBottom(true);
+  	};
+	$scope.scrollTop = function(){
+		$ionicScrollDelegate.scrollTop(true);
+	};
+})
+
+.controller('sentCtrl', function($scope,$http,$ionicModal, $ionicScrollDelegate) {
+	var pagenum = 0;
+	var status = "Y";
+	var globalpagecount = 0;
+	$scope.loadMore = function() {
+		var a = []
+		
+		var slocid = "1";
+		var orgid = "1";
+		var thermid = "3"
+		var searchtext = "NA";
+		
+		var pagecount = 5;
+		if(pagenum <= globalpagecount ){
+			pagenum += 1;
+			var userid = 1;
+			
+			var data_parameters = "slocid="+slocid+ "&orgid="+orgid+ "&userid="+userid+ "&pagenum="+pagenum+ "&pagecount="+pagecount+ "&searchtext="+searchtext;
+			$http.post("http://"+globalip+"/get_sent",data_parameters, {
+				headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'}
+			})
+			.success(function(response){
+				if(response[0].status != "N"){
+					globalpagecount = response[0].cnt;
+					$scope.response = response;
+					for (var i=0; i< $scope.response.length; i++) {
+						 $scope.items.push(response[i].msg_remarks);
+					}
+			
+				}
+				
+			});
+	}
+	
+	$scope.$broadcast('scroll.infiniteScrollComplete');
+	
+	};
+	
+	$scope.scrollTop = function(){
+		$ionicScrollDelegate.scrollTop(true);
+	};
+	$scope.items = [];
+  
+	$scope.scrollBottom = function() {
+   	 	$ionicScrollDelegate.scrollBottom(true);
+  	};
+})
+
+.controller('MyCtrl1', function($scope,$http,$ionicModal) {
+  	var slocid = "1";
+	var orgid = "1";
+	var thermid = "3";
+  	var data_parameters = "slocid="+slocid+ "&orgid="+orgid+ "&thermid="+thermid;
+	$http.post("http://"+globalip+"/get_root_control",data_parameters, {
+		headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'}
+	})
+	.success(function(response) {
+		if(response[0].status != "N")$scope.response = response;
+		else $scope.response = "City";
+	});
+  	/*
+	* if given group is the selected group, deselect it
+	* else, select the given group
+	*/
+	$scope.doRefresh = function() {
+    	console.log('Refreshing!');
+		var slocid = "1";
+		var orgid = "1";
+		var thermid = "3"
+		var data_parameters = "slocid="+slocid+ "&orgid="+orgid+ "&thermid="+thermid;
+		$http.post("http://"+globalip+"/get_root_control",data_parameters, {
+			headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'}
+		})
+		.success(function(response) {
+			if(response[0].status != "N")$scope.response = response;
+			else $scope.response = "City";
+			$scope.$broadcast('scroll.refreshComplete');
+		});
+		
+	};
+	
+	$scope.toggleGroup = function(group) {
+		if ($scope.isGroupShown(group)) {
+		  $scope.shownGroup = null;
+		} else {
+		  $scope.shownGroup = group;
+		}
+	};
+	
+	$scope.isGroupShown = function(group) {
+		return $scope.shownGroup === group;
+	};
+	
+})
+
+.controller('DetailCtrl', function($scope, $stateParams) {
+	console.log($stateParams.sensor_type);
+  	$scope.response = $stateParams.sensor_id;
+	$scope.response1 = $stateParams.sensor_type;
+	$scope.response2 = $stateParams.sensor_name;
+	$scope.response3 = $stateParams.schedule_name; 
+	$scope.response4 = $stateParams.sensor_type_id;
+	$scope.response5 = $stateParams.sensor_status;
+})
+
+.controller('CheckinCtrl', function($scope,$http) {
+	var slocid = "1";
+	var orgid = "1";
+	var thermid = "3";
+	var data_parameters = "slocid="+slocid+ "&orgid="+orgid+ "&thermid="+thermid;
+	$http.post("http://"+globalip+"/hvac_data",data_parameters, {
+		headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'}
+	})
+	.success(function(response) {
+		if(response[0].status != "N"){
+			$scope.response = response;
+			
+			$scope.setpointtemp = response[0].set_point_temprature;
+			
+			if(response[0].security_mode == "D"){
+				$scope.securityclass = "button ion-ios-unlocked ion-chevron-down button-clear button-dark custom-icon";
+				$scope.securitytext = "Disarm";
+			}
+			else{
+				$scope.securityclass = "button ion-ios-locked ion-chevron-down button-clear button-dark custom-icon";
+				$scope.securitytext = "Arm";
+			}
+			
+			if(response[0].heat_mode == "H"){
+				$scope.systemcontrolH = "custom-icon4";
+				$scope.systemcontrolC = "";
+				$scope.systemcontrolA = "";
+				$scope.systemcontrolO = "";
+			}
+			if(response[0].heat_mode == "C"){
+				$scope.systemcontrolH = "";
+				$scope.systemcontrolC = "custom-icon4";
+				$scope.systemcontrolA = "";
+				$scope.systemcontrolO = "";
+			}
+			if(response[0].heat_mode == "A"){
+				$scope.systemcontrolH = "";
+				$scope.systemcontrolC = "";
+				$scope.systemcontrolA = "custom-icon4";
+				$scope.systemcontrolO = "";
+			}
+			if(response[0].heat_mode == "O"){
+				$scope.systemcontrolH = "";
+				$scope.systemcontrolC = "";
+				$scope.systemcontrolA = "";
+				$scope.systemcontrolO = "custom-icon4";
+			}
+			
+			
+			if(response[0].fan_mode == "H"){
+				$scope.fancontrolHimg = "highimg_blue";
+				$scope.fancontrolMimg = "medimg";
+				$scope.fancontrolLimg = "lowimg";
+				$scope.fancontrolOimg = "offimg";
+				
+				$scope.fancontrolH = "custom-icon4";
+				$scope.fancontrolM = "";
+				$scope.fancontrolL = "";
+				$scope.fancontrolO = "";
+			}
+			if(response[0].fan_mode == "M"){
+				$scope.fancontrolHimg = "highimg";
+				$scope.fancontrolMimg = "medimg_blue";
+				$scope.fancontrolLimg = "lowimg";
+				$scope.fancontrolOimg = "offimg";
+				
+				$scope.fancontrolH = "";
+				$scope.fancontrolM = "custom-icon4";
+				$scope.fancontrolL = "";
+				$scope.fancontrolO = "";
+			}
+			if(response[0].fan_mode == "L"){
+				$scope.fancontrolHimg = "highimg";
+				$scope.fancontrolMimg = "medimg";
+				$scope.fancontrolLimg = "lowimg_blue";
+				$scope.fancontrolOimg = "offimg";
+				
+				$scope.fancontrolH = "";
+				$scope.fancontrolM = "";
+				$scope.fancontrolL = "custom-icon4";
+				$scope.fancontrolO = "";
+			}
+			if(response[0].fan_mode == "O"){
+				$scope.fancontrolHimg = "highimg";
+				$scope.fancontrolMimg = "medimg";
+				$scope.fancontrolLimg = "lowimg";
+				$scope.fancontrolOimg = "offimg_blue";
+				
+				$scope.fancontrolH = "";
+				$scope.fancontrolM = "";
+				$scope.fancontrolL = "";
+				$scope.fancontrolO = "custom-icon4";
+			}
+		}
+		else $scope.response = "City";
+	});
+	
+	
+	$scope.uptemp = function(){
+		value = $scope.setpointtemp;
+		if(value < 80){
+			value++;
+			$scope.setpointtemp = value;
+			var slocid = "1";
+			var orgid = "1";
+			var thermid = "3";
+			var userid = "1"
+			var scheduleid = 0;
+			var fan_mode = "X";
+			var heat_mode = "X";
+			var hvac_temprature = "X";
+			var security_mode = "X";
+			var set_point_temprature = $scope.setpointtemp;
+			
+			var data_parameters = "slocid="+slocid+ "&orgid="+orgid+ "&thermid="+thermid+ "&scheduleid="+scheduleid+ "&fan_mode="+fan_mode+ "&heat_mode="+heat_mode+ "&hvac_temprature="+hvac_temprature+ "&security_mode="+security_mode+ "&set_point_temprature="+set_point_temprature+ "&id="+userid;
+			$http.post("http://"+globalip+"/edit_hvac",data_parameters, {
+				headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'}
+			})
+			.success(function(response) {
+			});
+		}
+	};
+		
+	$scope.downtemp = function(){
+		value = $scope.setpointtemp;
+		if(value > 65){
+			value--;
+			$scope.setpointtemp = value;
+			var slocid = "1";
+			var orgid = "1";
+			var thermid = "3";
+			var userid = "1"
+			var scheduleid = 0;
+			var fan_mode = "X";
+			var heat_mode = "X";
+			var hvac_temprature = "X";
+			var security_mode = "X";
+			var set_point_temprature = $scope.setpointtemp;
+			
+			var data_parameters = "slocid="+slocid+ "&orgid="+orgid+ "&thermid="+thermid+ "&scheduleid="+scheduleid+ "&fan_mode="+fan_mode+ "&heat_mode="+heat_mode+ "&hvac_temprature="+hvac_temprature+ "&security_mode="+security_mode+ "&set_point_temprature="+set_point_temprature+ "&id="+userid;
+			$http.post("http://"+globalip+"/edit_hvac",data_parameters, {
+				headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'}
+			})
+			.success(function(response) {
+			});
+		}
+	};
+	
+	$scope.changesystemcontrol = function(response){
+		if(response == "H"){
+			$scope.systemcontrolH = "custom-icon4";
+			$scope.systemcontrolC = "";
+			$scope.systemcontrolA = "";
+			$scope.systemcontrolO = "";
+		}
+		if(response == "C"){
+			$scope.systemcontrolH = "";
+			$scope.systemcontrolC = "custom-icon4";
+			$scope.systemcontrolA = "";
+			$scope.systemcontrolO = "";
+		}
+		if(response == "A"){
+			$scope.systemcontrolH = "";
+			$scope.systemcontrolC = "";
+			$scope.systemcontrolA = "custom-icon4";
+			$scope.systemcontrolO = "";
+		}
+		if(response == "O"){
+			$scope.systemcontrolH = "";
+			$scope.systemcontrolC = "";
+			$scope.systemcontrolA = "";
+			$scope.systemcontrolO = "custom-icon4";
+		}
+		var slocid = "1";
+		var orgid = "1";
+		var thermid = "3";
+		var userid = "1"
+		var scheduleid = 0;
+		var fan_mode = "X";
+		var heat_mode = response;
+		var hvac_temprature = "X";
+		var security_mode = "X";
+		var set_point_temprature = "X";
+		
+		var data_parameters = "slocid="+slocid+ "&orgid="+orgid+ "&thermid="+thermid+ "&scheduleid="+scheduleid+ "&fan_mode="+fan_mode+ "&heat_mode="+heat_mode+ "&hvac_temprature="+hvac_temprature+ "&security_mode="+security_mode+ "&set_point_temprature="+set_point_temprature+ "&id="+userid;
+		$http.post("http://"+globalip+"/edit_hvac",data_parameters, {
+			headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'}
+		})
+		.success(function(response) {
+		});
+	};
+	
+	$scope.changefancontrol = function(response){
+		
+		if(response == "H"){
+				$scope.fancontrolHimg = "highimg_blue";
+				$scope.fancontrolMimg = "medimg";
+				$scope.fancontrolLimg = "lowimg";
+				$scope.fancontrolOimg = "offimg";
+				
+				$scope.fancontrolH = "custom-icon4";
+				$scope.fancontrolM = "";
+				$scope.fancontrolL = "";
+				$scope.fancontrolO = "";
+			}
+			if(response == "M"){
+				$scope.fancontrolHimg = "highimg";
+				$scope.fancontrolMimg = "medimg_blue";
+				$scope.fancontrolLimg = "lowimg";
+				$scope.fancontrolOimg = "offimg";
+				
+				$scope.fancontrolH = "";
+				$scope.fancontrolM = "custom-icon4";
+				$scope.fancontrolL = "";
+				$scope.fancontrolO = "";
+			}
+			if(response == "L"){
+				$scope.fancontrolHimg = "highimg";
+				$scope.fancontrolMimg = "medimg";
+				$scope.fancontrolLimg = "lowimg_blue";
+				$scope.fancontrolOimg = "offimg";
+				
+				$scope.fancontrolH = "";
+				$scope.fancontrolM = "";
+				$scope.fancontrolL = "custom-icon4";
+				$scope.fancontrolO = "";
+			}
+			if(response == "O"){
+				$scope.fancontrolHimg = "highimg";
+				$scope.fancontrolMimg = "medimg";
+				$scope.fancontrolLimg = "lowimg";
+				$scope.fancontrolOimg = "offimg_blue";
+				
+				$scope.fancontrolH = "";
+				$scope.fancontrolM = "";
+				$scope.fancontrolL = "";
+				$scope.fancontrolO = "custom-icon4";
+			}
+		var slocid = "1";
+		var orgid = "1";
+		var thermid = "3";
+		var userid = "1"
+		var scheduleid = 0;
+		var fan_mode = response;
+		var heat_mode = "X";
+		var hvac_temprature = "X";
+		var security_mode = "X";
+		var set_point_temprature = "X";
+		
+		
+		var data_parameters = "slocid="+slocid+ "&orgid="+orgid+ "&thermid="+thermid+ "&scheduleid="+scheduleid+ "&fan_mode="+fan_mode+ "&heat_mode="+heat_mode+ "&hvac_temprature="+hvac_temprature+ "&security_mode="+security_mode+ "&set_point_temprature="+set_point_temprature+ "&id="+userid;
+		$http.post("http://"+globalip+"/edit_hvac",data_parameters, {
+			headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'}
+		})
+		.success(function(response) {
+		});
+	};
+	
+	$scope.changesecurity = function(){
+		var smode = "";
+		if($scope.securitytext == "Arm"){
+			$scope.securityclass = "button ion-ios-unlocked ion-chevron-down button-clear button-dark custom-icon";
+			$scope.securitytext = "Disarm";
+			smode = "D";
+		}
+		else{
+			$scope.securityclass = "button ion-ios-locked ion-chevron-down button-clear button-dark custom-icon";
+			$scope.securitytext = "Arm";
+			smode = "A";
+		}
+		
+		var slocid = "1";
+		var orgid = "1";
+		var thermid = "3";
+		var userid = "1"
+		var scheduleid = 0;
+		var fan_mode = "X";
+		var heat_mode = "X";
+		var hvac_temprature = "X";
+		var security_mode = smode;
+		var set_point_temprature = "X";
+		
+		
+		var data_parameters = "slocid="+slocid+ "&orgid="+orgid+ "&thermid="+thermid+ "&scheduleid="+scheduleid+ "&fan_mode="+fan_mode+ "&heat_mode="+heat_mode+ "&hvac_temprature="+hvac_temprature+ "&security_mode="+security_mode+ "&set_point_temprature="+set_point_temprature+ "&id="+userid;
+		$http.post("http://"+globalip+"/edit_hvac",data_parameters, {
+			headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'}
+		})
+		.success(function(response) {
+		});
+	};
+})
+
+
+
+.controller('AttendeesCtrl', function($scope) {
+  $scope.activity = [];
+  $scope.arrivedChange = function(attendee) {
+    var msg = attendee.firstname + ' ' + attendee.lastname;
+    msg += (!attendee.arrived ? ' has arrived, ' : ' just left, '); 
+    msg += new Date().getMilliseconds();
+    $scope.activity.push(msg);
+    if($scope.activity.length > 3) {
+      $scope.activity.splice(0, 1);
+    }
+  };
+  
+});
+
+</script>
+  </body>
+</html>
